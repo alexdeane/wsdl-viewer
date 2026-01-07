@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <div>
+        <label>Enter wsdl file URI</label>
+        <input id="wsdl_uri">
+        <button type="button" onclick="renderWsdl()">render wsdl</button>
+    </div>
+    <div>
+        <label>Enter xsd file URI</label>
+        <input id="xsd_uri">
+        <button type="button" onclick="renderXsd()">render xsd</button>
+    </div>
+</div>
+
+<script>
+    function renderWsdl() {
+        window.location = "/renderWsdl?uri=" + document.getElementById("wsdl_uri").value;
+    }
+    function renderXsd() {
+        window.location = "/renderXsd?uri=" + document.getElementById("xsd_uri").value;
+    }
+</script>
