@@ -867,6 +867,16 @@ code {
 	color: #e5e7eb;
 }
 
+pre[class*="language-"] {
+	background: rgba(15, 23, 42, 0.9) !important;
+	border-radius: 10px;
+	border: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+code[class*="language-"] {
+	background: transparent !important;
+}
+
 .code-wrapper {
 	position: relative;
 	display: inline-block;
@@ -1445,7 +1455,7 @@ code {
                         </xsl:attribute>
                         📋
                     </button>
-                    <code id="{$example-id}">
+                    <code id="{$example-id}" class="language-xml">
                         <xsl:text>&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:m="</xsl:text>
                         <xsl:value-of select="$consolidated-wsdl/@targetNamespace"/>
                         <xsl:text>"&gt;&#10;  &lt;soapenv:Header/&gt;&#10;  &lt;soapenv:Body&gt;&#10;    &lt;m:</xsl:text>
@@ -3365,6 +3375,10 @@ code {
             <style type="text/css">
                 <xsl:value-of select="$css" disable-output-escaping="yes"/>
             </style>
+            
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-tomorrow.min.css"/>
+            
+            <script src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/prism.min.js"></script>
             
             <script type="text/javascript">
                 <xsl:text disable-output-escaping="yes">
