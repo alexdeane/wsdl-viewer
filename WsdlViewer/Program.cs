@@ -1,10 +1,14 @@
 using WsdlViewer.WsdlClient;
+using WsdlViewer.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<WsdlClient>();
+
+builder.Services.AddRateLimiting();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -29,5 +33,6 @@ app.MapControllerRoute(
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.UseRateLimiter();
 
 app.Run();
