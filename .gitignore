@@ -4,3 +4,6 @@ bin/
 obj/
 appsettings.Development.json
 *.sln.DotSettings.user
+.vscode/
+.idea/
+.vs/

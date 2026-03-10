@@ -1,149 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--
-/**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
--->
-
-
-<!--
-* ====================================================================
-* wsdl-viewer.xsl
-* Version: 3.1.04
-*
-* URL: http://tomi.vanek.sk/xml/wsdl-viewer.xsl
-*
-* Author: tomi vanek
-* Inspiration: Uche Ogbui - WSDL processing with XSLT
-* ====================================================================
--->
-
-
-<!--
-* ====================================================================
-* Description:
-* 		wsdl-viewer.xsl is a lightweight XSLT 1.0 transformation with minimal
-* 		usage of any hacks that extend the possibilities of the transformation
-* 		over the XSLT 1.0 constraints but eventually would harm the engine independance.
-*
-* 		The transformation has to run even in the browser offered XSLT engines
-* 		(tested in IE 6 and Firefox) and in ANT "batch" processing.
-* ====================================================================
-* How to add the HTML look to a WSDL:
-* 		<?xml version="1.0" encoding="utf-8"?>
-* 		<?xml-stylesheet type="text/xsl" href="wsdl-viewer.xsl"?>
-* 		<wsdl:definitions ...>
-* 		    ... Here is the service declaration
-* 		</wsdl:definitions>
-*
-* 		The web-browsers (in Windows) are not able by default automatically recognize
-* 		the ".wsdl" file type (suffix). For the type recognition the WSDL file has
-* 		to be renamed by adding the suffix ".xml" - i.e. "myservice.wsdl.xml".
-* ====================================================================
-* Constraints:
-* 	1. Processing of imported files
-* 		1.1 Only 1 imported WSDL and 1 imported XSD is processed
-* 			(well, maybe with a smarter recursive strategy this restriction could be overcome)
-* 		1.2 No recursive including is supported (i.e. includes in included XSD are ignored)
-* 	2. Namespace support
-* 		2.1 Namespaces are not taken in account by processing (references with NS)
-* 	3. Source code
-* 		3.1 Only the source code allready processed by the XML parser is rendered - implications:
-* 			== no access to the XML head line (<?xml version="1.0" encoding="utf-8"?>)
-* 			== "expanded" CDATA blocks (parser processes the CDATA,
-* 				XSLT does not have access to the original code)
-* 			== no control over the code page
-* 			== processing of special characters
-* 			== namespace nodes are not rendered (just the namespace aliases)
-* ====================================================================
-* Possible improvements:
-* 	* Functional requirements
-* 		+ SOAP 1.2 binding (http://schemas.xmlsoap.org/wsdl/soap12/WSDL11SOAP12.pdf)
-* 		+ WSDL 2.0 (http://www.w3.org/TR/2006/CR-wsdl20-primer-20060327/)
-* 		+ Recognition of WSDL patterns (interface, binding, service instance, ...)
-* 		- Creating an xsd-viewer.xsl for XML-Schema file viewing
-* 			(extracting the functionality from wsdl-viewer into separate XSLT)
-* 		- Check the full support of the WSDL and XSD going through the standards
-* 		- Real-world WSDL testing
-* 		- XSLT 2.0 (http://www-128.ibm.com/developerworks/library/x-xslt20pt5.html) ???
-* 		? Adding more derived information
-* 			* to be defined, what non-trivial information can we read out from the WSDL
-* 	* XSLT
-* 		+ Modularization
-* 			- Is it meaningful?
-* 			- Maybe more distribution alternatives (modular, fat monolithic, thin performance monolithic)?
-* 			- Distribution build automatization
-* 		+ Dynamic page: JavaSript
-* 		+ Performance
-* 		- Better code comments / documentation
-* 		- SOAP client form - for testing the web service (AJAX based)
-* 		- New XSD parser - clean-up the algorithm
-* 		- Complete (recursive, multiple) include support
-* 		? Namespace-aware version (no string processing hacks ;-)
-* 			* I think, because of the goal to support as many engines as possible,
-* 				this requirement is unrealistic. Maybe when XSLT 2.0 will be supported
-* 				in a huge majority of platforms, we can rethink this point....
-* 				(problems with different functionality of namespace-uri XPath function by different engines)
-* 	* Development architecture
-* 		- Setup of the development infrastructure
-* 		- Unit testing
-* ====================================================================
--->
-
-
-<!--
-* ====================================================================
-* History:
-* 	2005-04-15 - Initial implementation
-* 	2005-09-12 - Removed xsl:key to be able to use the James Clark's XT engine on W3C web-site
-* 	2006-10-06 - Removed the Oliver Becker's method of conditional selection
-* 				of a value in a single expression (in Xalan/XSLTC this hack does not work!)
-* 	2005-10-07 - Duplicated operations
-* 	2006-12-08 - Import element support
-* 	2006-12-14 - Displays all fault elements (not just the first one)
-* 	2006-12-28 - W3C replaced silently the James Clark's XT engine with Michael Kay's closed-source Saxon!
-* 				wsdl-viewer.xsl will no longer support XT engine
-* 	2007-02-28 - Stack-overflow bug (if the XSD element @name and @type are identic)
-* 	2007-03-08 - 3.0.00 - New parsing, new layout
-* 	2007-03-28 - 3.0.01 - Fix: New anti-recursion defense (no error message by recursion
-* 						because of dirty solution of namespace processing)
-* 						- Added: variables at the top to turn on/off certain details
-* 	2007-03-29 - 3.0.02 - Layout clean-up for IE
-* 	2007-03-29 - 3.0.03 - Fix: Anti-recursion algorithm
-* 	2007-03-30 - 3.0.04 - Added: source code rendering of imported WSDL and XSD
-* 	2007-04-15 - 3.0.05 - Fix: Recursive calls in element type rendering
-* 						- Fix: Rendering of messages (did not render the message types of complex types)
-* 						- Fix: Links in src. by arrays
-* 						- Fix: $binding-info
-* 	2007-04-15 - 3.0.06 - Added: Extended rendering control ENABLE-xxx parameters
-* 						- Changed: Anti-recursion algorithm has recursion-depth parameter
-* 	2007-07-19 - 3.0.07 - Fix: Rendering of array type in detail
-* 	2007-08-01 - 3.0.08 - Fix: xsl:template name="render-type"
-* 						  Fix: typo - "Impotred WSDL" should be "Impotred WSDL"
-* 	2007-08-16 - 3.0.09 - Fix: xsl:template name="render-type" - anti recursion
-* 	2007-12-05 - 3.1.00 - Modularized
-* 	2007-12-23 - 3.1.01 - Terminating message by WS without interface or service definition was removed
-* 						  (seems to be a correct state)
-* 	2008-08-20 - 3.1.02 - Woden-214: Anti-recursion bypassed in xsd:choice element
-* 	2019-01-03 - 3.1.03 - Fix for `small` tag - recursively smaller text
-* 	2024-11-11 - 3.1.04 - Fix - removed missing included javascript (the JS functionality was never implemented)
-* ====================================================================
--->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.w3.org/1999/xhtml" xmlns:ws="http://schemas.xmlsoap.org/wsdl/" xmlns:ws2="http://www.w3.org/ns/wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:local="http://tomi.vanek.sk/xml/wsdl-viewer" version="1.0" exclude-result-prefixes="ws ws2 xsd soap local">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.w3.org/1999/xhtml" xmlns:ws="http://schemas.xmlsoap.org/wsdl/" xmlns:ws2="http://www.w3.org/ns/wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:local="http://alexdeane.dev/xml/wsdl-viewer" version="1.0" exclude-result-prefixes="ws ws2 xsd soap local">
     
     <xsl:output method="html" doctype-system="about:legacy-compat" encoding="utf-8" indent="no" media-type="text/html"/>
     
@@ -410,8 +267,6 @@ body {
 	margin: 0;
 	padding: .5em 4em;
 	color: white;
-	background-color: red;
-	border: 1px solid darkred;
 }
 
 #content {
@@ -717,6 +572,315 @@ h3 {
 }
 */
 
+/* App overrides for modern dark theme */
+html,
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	color: #e5e7eb;
+	background: radial-gradient(circle at top left, #1f2937 0, #020617 48%, #020617 100%);
+}
+
+body {
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+}
+
+#outer_box {
+	flex: 1;
+	display: flex;
+	padding: 2.5rem 1rem;
+	box-sizing: border-box;
+}
+
+#inner_box {
+	max-width: 1120px;
+	margin: 0 auto;
+	width: 100%;
+	background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 55%) #0f172a;
+	border-radius: 18px;
+	border: 1px solid rgba(148, 163, 184, 0.32);
+	box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+	padding: 1.75rem 1.75rem 1.5rem;
+	box-sizing: border-box;
+	color: #e5e7eb;
+}
+
+#outer_links {
+	display: none;
+}
+
+#outer_nav {
+	margin: 0 0 1rem;
+	padding: 0;
+}
+
+#nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	margin: 0;
+	padding: 0.35rem;
+	list-style: none;
+	border-radius: 999px;
+	background: rgba(15, 23, 42, 0.85);
+	border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+#nav ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+#nav li {
+	display: inline-flex;
+}
+
+#nav a {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	padding: 0.4rem 0.9rem;
+	border-radius: 999px;
+	font-size: 0.8rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #e5e7eb;
+	background: transparent;
+	border: 1px solid transparent;
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+#nav a:hover {
+	background: rgba(56, 189, 248, 0.14);
+	border-color: rgba(56, 189, 248, 0.6);
+	color: #f9fafb;
+	transform: translateY(-1px);
+}
+
+#nav a.current:link,
+#nav a.current:visited,
+#nav a.current:hover {
+	background: #38bdf8;
+	border-color: #38bdf8;
+	color: #020617;
+}
+
+#header {
+	margin: 0 0 1rem;
+	padding: 0.5rem 0.25rem 0.25rem;
+	border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+#content {
+	margin: 0;
+	padding: 0.5rem 0 0.25rem;
+}
+
+#footer {
+	margin: 1.25rem 0 0;
+	padding-top: 0.75rem;
+	border-top: 1px solid rgba(148, 163, 184, 0.35);
+	font-size: 0.8rem;
+	color: #9ca3af;
+	text-align: right;
+}
+
+.page {
+	border-bottom: 1px dashed rgba(148, 163, 184, 0.4);
+	padding: 1.1rem 0 1.25rem;
+	margin: 0;
+}
+
+.value,
+.label {
+	margin: 0;
+	padding: 0;
+}
+
+.label {
+	float: left;
+	width: 160px;
+	text-align: right;
+	font-weight: 600;
+	padding-bottom: 0.5rem;
+	margin-right: 0;
+	color: #9ca3af;
+	font-size: 0.86rem;
+}
+
+.value {
+	margin-left: 172px;
+	padding-bottom: 0.5rem;
+	color: #e5e7eb;
+	font-size: 0.9rem;
+}
+
+strong,
+strong a {
+	color: #e5e7eb;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+}
+
+a {
+	color: #38bdf8;
+}
+
+a:hover {
+	color: #0ea5e9;
+}
+
+a.local:link,
+a.local:visited {
+	margin-left: 10px;
+	border-bottom: 1px dotted rgba(56, 189, 248, 0.75);
+	text-decoration: none;
+	font-style: italic;
+	color: #38bdf8;
+}
+
+a.local:hover {
+	color: #0ea5e9;
+	border-bottom-style: solid;
+}
+
+a.target:link,
+a.target:visited,
+a.target:hover {
+	text-decoration: none;
+	border-bottom: none;
+	background: transparent;
+}
+
+.box {
+	padding: 0.75rem 0.9rem;
+	border-radius: 10px;
+	color: #e5e7eb;
+	background: rgba(15, 23, 42, 0.9);
+	border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.shadow {
+	background: transparent;
+}
+
+.shadow div {
+	position: static;
+}
+
+.indent {
+	margin: 0.4rem 0 0.4rem 1.25rem;
+}
+
+.xml-element,
+.xml-proc,
+.xml-comment {
+	margin: 0.15rem 0;
+	padding: 0.15rem 0;
+}
+
+.xml-element {
+	word-spacing: 0.15rem;
+	color: #f97316;
+	font-weight: 600;
+	border-left: 1px dotted rgba(148, 163, 184, 0.35);
+}
+
+.xml-element div {
+	margin: 0.2rem 0 0.2rem 2rem;
+}
+
+.xml-att {
+	color: #38bdf8;
+	font-weight: 500;
+}
+
+.xml-att-val {
+	color: #a5b4fc;
+}
+
+.xml-proc {
+	color: #facc15;
+	font-style: italic;
+}
+
+.xml-comment {
+	color: #6ee7b7;
+	font-style: italic;
+}
+
+.xml-text {
+	color: #e5e7eb;
+}
+
+h1,
+h2,
+h3 {
+	margin: 0 0 0.75rem;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-weight: 600;
+}
+
+h1 {
+	font-size: 1.6rem;
+	letter-spacing: 0.06em;
+}
+
+h2 {
+	font-size: 1.3rem;
+}
+
+h3 {
+	font-size: 1.1rem;
+}
+
+.port {
+	margin-bottom: 0.9rem;
+	padding-bottom: 0.9rem;
+	border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+}
+
+.operation {
+	margin-bottom: 1.1rem;
+	padding-bottom: 0.9rem;
+	border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+}
+
+pre,
+code {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	font-size: 0.82rem;
+}
+
+pre {
+	background: rgba(15, 23, 42, 0.9);
+	border-radius: 10px;
+	border: 1px solid rgba(148, 163, 184, 0.45);
+	padding: 0.75rem 0.9rem;
+	overflow-x: auto;
+}
+
+code {
+	color: #e5e7eb;
+}
+
+.warning .label {
+	color: #facc15;
+}
+
+.warning .value {
+	color: #fef3c7;
+}
+
 </xsl:variable>
     
     <!--
@@ -819,26 +983,14 @@ h3 {
         <xsl:param name="version"/>
         
         <div>
-            	This page has been generated by 
-            <big>wsdl-viewer.xsl</big>
-            , version 
+        
             <xsl:value-of select="$version"/>
             <br/>
-            	Author: 
-            <a href="http://tomi.vanek.sk/">tomi vanek</a>
+            	Author: Alex Deane
             <br/>
-            	Download at 
-            <a href="http://tomi.vanek.sk/xml/wsdl-viewer.xsl">http://tomi.vanek.sk/xml/wsdl-viewer.xsl</a>
-            .
+            Inspired by the
+            <a href="http://tomi.vanek.sk/xml/wsdl-viewer.xsl">wsdl-viewer.xsl</a> transformation by <a href="http://tomi.vanek.sk/">tomi vanek</a>
             <br/>
-            	
-            <br/>
-            	The transformation was inspired by the article
-            <br/>
-            	Uche Ogbuji: 
-            <a href="http://www-106.ibm.com/developerworks/library/ws-trans/index.html">WSDL processing with XSLT</a>
-            <br/>
-            
         </div>
         
     </xsl:template>
@@ -928,7 +1080,19 @@ h3 {
             		
             <xsl:choose>
                 			
-                <xsl:when test="starts-with($binding-protocol, 'http://www.w3.org/2003/05/soap/bindings/HTTP')"> over HTTP</xsl:when>
+                <xsl:when test="starts-with($binding-protocol, 'http://www.w3.org/2003/05/soap/bindings/HTTP') or contains($binding-protocol, 'http://schemas.xmlsoap.org/soap/http')"> over HTTP</xsl:when>
+                			
+                <xsl:when test="contains(translate($binding-protocol, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'JMS')"> over JMS</xsl:when>
+                			
+                <xsl:when test="contains(translate($binding-protocol, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'HTTPS')"> over HTTPS</xsl:when>
+                			
+                <xsl:when test="contains(translate($binding-protocol, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'TCP')"> over TCP</xsl:when>
+                			
+                <xsl:when test="string-length($binding-protocol) &gt; 0">
+                    <xsl:text> (</xsl:text>
+                    <xsl:value-of select="$binding-protocol"/>
+                    <xsl:text>)</xsl:text>
+                </xsl:when>
                 			
                 <xsl:otherwise/>
                 		
@@ -1231,6 +1395,40 @@ h3 {
         </ol>
         
     </xsl:template>
+    <xsl:template name="operations.render-example-soap">
+        	
+        <xsl:param name="operation-name"/>
+        	
+        <xsl:param name="example-id"/>
+        	
+        <div class="label">Example request (SOAP 1.1):</div>
+        	
+        <div class="value">
+            		
+            <pre>
+                <code id="{$example-id}">
+                    <xsl:text>&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:m="</xsl:text>
+                    <xsl:value-of select="$consolidated-wsdl/@targetNamespace"/>
+                    <xsl:text>"&gt;&#10;  &lt;soapenv:Header/&gt;&#10;  &lt;soapenv:Body&gt;&#10;    &lt;m:</xsl:text>
+                    <xsl:value-of select="$operation-name"/>
+                    <xsl:text>&gt;&#10;      &lt;!-- Populate request parameters according to the schema-defined model --&gt;&#10;    &lt;/m:</xsl:text>
+                    <xsl:value-of select="$operation-name"/>
+                    <xsl:text>&gt;&#10;  &lt;/soapenv:Body&gt;&#10;&lt;/soapenv:Envelope&gt;</xsl:text>
+                </code>
+            </pre>
+            		
+            <button type="button">
+                <xsl:attribute name="onclick">
+                    <xsl:text>copyExample('</xsl:text>
+                    <xsl:value-of select="$example-id"/>
+                    <xsl:text>')</xsl:text>
+                </xsl:attribute>
+                Copy
+            </button>
+            	
+        </div>
+        
+    </xsl:template>
     <xsl:template match="ws2:operation" mode="operations">
         	
         <xsl:variable name="binding-info" select="$consolidated-wsdl/ws2:binding[@interface = current()/../@name or substring-after(@interface, ':') = current()/../@name]/ws2:operation[@ref = current()/@name or substring-after(@ref, ':') = current()/@name]"/>
@@ -1261,9 +1459,46 @@ h3 {
             	
             <xsl:if test="$ENABLE-STYLEOPTYPEPATH">
                 		
-                <!-- TODO: add the operation attributes - according the WSDL 2.0 spec. -->
+                <xsl:if test="@*[local-name() != 'name']">
+                    		
+                    <div class="label">Attributes:</div>
+                    		
+                    <div class="value">
+                        			
+                        <ul>
+                            				
+                            <xsl:for-each select="@*[local-name() != 'name']">
+                                					
+                                <li>
+                                    <b>
+                                        <xsl:value-of select="local-name()"/>
+                                        <xsl:text>:</xsl:text>
+                                    </b>
+                                    <xsl:text> </xsl:text>
+                                    <code>
+                                        <xsl:value-of select="."/>
+                                    </code>
+                                </li>
+                                				
+                            </xsl:for-each>
+                            			
+                        </ul>
+                        		
+                    </div>
+                    	
+                </xsl:if>
                 	
             </xsl:if>
+            
+            <xsl:variable name="example-id" select="concat('example-', generate-id(.))"/>
+            	
+            <xsl:call-template name="operations.render-example-soap">
+                		
+                <xsl:with-param name="operation-name" select="@name"/>
+                		
+                <xsl:with-param name="example-id" select="$example-id"/>
+                	
+            </xsl:call-template>
             	
             <xsl:apply-templates select="ws2:input|ws2:output|../ws2:fault[@name = ws2:infault/@ref or @name = ws2:outfault/@ref]" mode="operations.message">
                 		
@@ -1303,7 +1538,23 @@ h3 {
                 			
                 <xsl:variable name="type-tree" select="$consolidated-xsd[@name = $type-name and not(xsd:simpleType)][1]"/>
                 			
-                <xsl:apply-templates select="$type-tree" mode="operations.message.part"/>
+                <xsl:choose>
+                    				
+                    <xsl:when test="$type-tree">
+                        					
+                        <xsl:apply-templates select="$type-tree" mode="operations.message.part"/>
+                        				
+                    </xsl:when>
+                    				
+                    <xsl:otherwise>
+                        					
+                        <div class="box">
+                            <i>No detailed complex type structure is available for this message.</i>
+                        </div>
+                        				
+                    </xsl:otherwise>
+                    			
+                </xsl:choose>
                 		
             </div>
             	
@@ -1460,6 +1711,16 @@ h3 {
                 </xsl:if>
                 	
             </xsl:if>
+            
+            <xsl:variable name="example-id" select="concat('example-', generate-id(.))"/>
+            	
+            <xsl:call-template name="operations.render-example-soap">
+                		
+                <xsl:with-param name="operation-name" select="@name"/>
+                		
+                <xsl:with-param name="example-id" select="$example-id"/>
+                	
+            </xsl:call-template>
             	
             <xsl:apply-templates select="ws:input|ws:output|ws:fault" mode="operations.message">
                 		
@@ -1620,7 +1881,23 @@ h3 {
                     				
                     <xsl:variable name="part-type" select="$consolidated-xsd[@name = $type-name and not(xsd:simpleType)][1]"/>
                     				
-                    <xsl:apply-templates select="$part-type" mode="operations.message.part"/>
+                    <xsl:choose>
+                        					
+                        <xsl:when test="$part-type">
+                            						
+                            <xsl:apply-templates select="$part-type" mode="operations.message.part"/>
+                            					
+                        </xsl:when>
+                        					
+                        <xsl:otherwise>
+                            						
+                            <div>
+                                <i>No nested complex structure is defined for this part.</i>
+                            </div>
+                            					
+                        </xsl:otherwise>
+                        				
+                    </xsl:choose>
                     			
                 </xsl:when>
                 			
@@ -3048,7 +3325,7 @@ h3 {
             	
             <meta http-equiv="content-style-type" content="text/css"/>
             	
-            <meta name="Generator" content="http://tomi.vanek.sk/xml/wsdl-viewer.xsl"/>
+            <meta name="Generator" content="http://alexdeane.dev/xml/wsdl-viewer.xsl"/>
             	
             <meta http-equiv="imagetoolbar" content="false"/>
             	
@@ -3057,6 +3334,27 @@ h3 {
             <style type="text/css">
                 <xsl:value-of select="$css" disable-output-escaping="yes"/>
             </style>
+            
+            <script type="text/javascript">
+                <xsl:text disable-output-escaping="yes">
+function copyExample(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var text = el.innerText || el.textContent || '';
+  if (navigator.clipboard &amp;&amp; navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text);
+    return;
+  }
+  var range = document.createRange();
+  range.selectNodeContents(el);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  try { document.execCommand('copy'); } catch (e) {}
+  sel.removeAllRanges();
+}
+                </xsl:text>
+            </script>
             
         </head>
         
@@ -3193,16 +3491,7 @@ h3 {
 ==================================================================
 -->
     
-    <xsl:template name="footer.render">
-        
-        <div id="footer">
-            	This page was generated by wsdl-viewer.xsl (
-            <a href="http://tomi.vanek.sk">http://tomi.vanek.sk</a>
-            )
-
-        </div>
-        
-    </xsl:template>
+    <xsl:template name="footer.render" />
     
     <!--
 ==================================================================
@@ -3286,19 +3575,43 @@ h3 {
                     			
                     <xsl:when test="$consolidated-wsdl/ws2:interface/@name">
                         				
-
-
-                        <!-- TODO: What to do if there are more interfaces? -->
+                        <xsl:variable name="iface-count" select="count($consolidated-wsdl/ws2:interface)"/>
                         				
-                        <xsl:apply-templates select="$consolidated-wsdl/ws2:interface[1]" mode="operations"/>
+                        <xsl:if test="$iface-count &gt; 1">
+                            					
+                            <li class="warning">
+                                						
+                                <div class="label">Notice:</div>
+                                						
+                                <div class="value">
+                                    <xsl:text>Multiple interfaces detected (</xsl:text>
+                                    <xsl:value-of select="$iface-count"/>
+                                    <xsl:text>). Showing all interfaces.</xsl:text>
+                                </div>
+                                					
+                            </li>
+                            				
+                        </xsl:if>
+                        				
+                        <xsl:apply-templates select="$consolidated-wsdl/ws2:interface" mode="operations">
+                            					
+                            <xsl:sort select="@name"/>
+                            				
+                        </xsl:apply-templates>
                         			
                     </xsl:when>
                     			
                     <xsl:otherwise>
                         				
-
-
-                        <!-- TODO: Error message or handling somehow this unexpected situation -->
+                        <li class="warning">
+                            					
+                            <div class="label">Warning:</div>
+                            					
+                            <div class="value">
+                                <xsl:text>No interfaces or portTypes were found to render operation details.</xsl:text>
+                            </div>
+                            				
+                        </li>
                         			
                     </xsl:otherwise>
                     		

@@ -1,26 +1,66 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "WSDL & XSD Viewer";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <div>
-        <label>Enter wsdl file URI</label>
-        <input id="wsdl_uri">
-        <button type="button" onclick="renderWsdl()">render wsdl</button>
+<div class="viewer-shell">
+    <div class="viewer-header">
+        <h1>WSDL &amp; XSD Viewer</h1>
+        <p>Paste a URL or drop a file from your desktop to explore operations and schema models.</p>
     </div>
-    <div>
-        <label>Enter xsd file URI</label>
-        <input id="xsd_uri">
-        <button type="button" onclick="renderXsd()">render xsd</button>
+
+    <div class="viewer-grid">
+        <section class="viewer-card">
+            <h2>WSDL</h2>
+
+            <form id="wsdl-form" method="post" enctype="multipart/form-data" action="/renderWsdl">
+                <div class="mb-3">
+                    <label for="wsdl_uri" class="form-label">WSDL URL</label>
+                    <input id="wsdl_uri" name="uri" class="form-control" placeholder="https://example.com/service.wsdl" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="wsdl_file" class="form-label">Or choose a local WSDL file</label>
+                    <input id="wsdl_file" name="wsdlFile" type="file" accept=".wsdl,.xml,.xsd" class="form-control" />
+                </div>
+
+                <div id="wsdl-dropzone" class="dropzone" data-target-input="wsdl_file">
+                    <span class="dropzone-title">Drag &amp; drop WSDL file here</span>
+                    <span class="dropzone-subtitle">We never upload anything beyond this browser session.</span>
+                </div>
+
+                <div class="viewer-actions">
+                    <button type="submit" class="btn btn-primary">View WSDL</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="viewer-card">
+            <h2>XSD</h2>
+
+            <form id="xsd-form" method="post" enctype="multipart/form-data" action="/renderXsd">
+                <div class="mb-3">
+                    <label for="xsd_uri" class="form-label">XSD URL</label>
+                    <input id="xsd_uri" name="uri" class="form-control" placeholder="https://example.com/schema.xsd" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="xsd_file" class="form-label">Or choose a local XSD file</label>
+                    <input id="xsd_file" name="xsdFile" type="file" accept=".xsd,.xml,.wsdl" class="form-control" />
+                </div>
+
+                <div id="xsd-dropzone" class="dropzone" data-target-input="xsd_file">
+                    <span class="dropzone-title">Drag &amp; drop XSD file here</span>
+                    <span class="dropzone-subtitle">Remote and relative imports are resolved for you.</span>
+                </div>
+
+                <div class="viewer-actions">
+                    <button type="submit" class="btn btn-outline-primary">View XSD</button>
+                </div>
+            </form>
+        </section>
     </div>
 </div>
 
-<script>
-    function renderWsdl() {
-        window.location = "/renderWsdl?uri=" + document.getElementById("wsdl_uri").value;
-    }
-    function renderXsd() {
-        window.location = "/renderXsd?uri=" + document.getElementById("xsd_uri").value;
-    }
-</script>
+@section Scripts {
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}
