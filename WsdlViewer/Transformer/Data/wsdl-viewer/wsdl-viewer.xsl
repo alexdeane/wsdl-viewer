@@ -90,9 +90,7 @@ body {
 
 #inner_box {
 	width: auto;
-	background-color: white;
 	color: black;
-	border: 1px solid navy;
 }
 
 /**
@@ -580,7 +578,7 @@ body {
 	height: 100%;
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	color: #e5e7eb;
-	background: radial-gradient(circle at top left, #1f2937 0, #020617 48%, #020617 100%);
+	background: #020617;
 }
 
 body {
@@ -600,10 +598,6 @@ body {
 	max-width: 1120px;
 	margin: 0 auto;
 	width: 100%;
-	background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 55%) #0f172a;
-	border-radius: 18px;
-	border: 1px solid rgba(148, 163, 184, 0.32);
-	box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
 	padding: 1.75rem 1.75rem 1.5rem;
 	box-sizing: border-box;
 	color: #e5e7eb;
@@ -873,12 +867,48 @@ code {
 	color: #e5e7eb;
 }
 
+.code-wrapper {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+
+.code-copy-btn {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	padding: 0;
+	border-radius: 0;
+	border: none;
+	background: transparent;
+	color: #e5e7eb;
+	font-size: 0.8rem;
+	line-height: 1;
+	cursor: pointer;
+	opacity: 0.45;
+	transform: translateY(-2px);
+	transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.code-wrapper:hover .code-copy-btn {
+	opacity: 0.9;
+	transform: translateY(0);
+}
+
 .warning .label {
 	color: #facc15;
 }
 
 .warning .value {
 	color: #fef3c7;
+}
+
+.title-page {
+    background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 55%) #0f172a;
+	border-radius: 18px;
+	border: 1px solid rgba(148, 163, 184, 0.32);
+	box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+    padding: 12px;
 }
 
 </xsl:variable>
@@ -1405,26 +1435,27 @@ code {
         	
         <div class="value">
             		
-            <pre>
-                <code id="{$example-id}">
-                    <xsl:text>&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:m="</xsl:text>
-                    <xsl:value-of select="$consolidated-wsdl/@targetNamespace"/>
-                    <xsl:text>"&gt;&#10;  &lt;soapenv:Header/&gt;&#10;  &lt;soapenv:Body&gt;&#10;    &lt;m:</xsl:text>
-                    <xsl:value-of select="$operation-name"/>
-                    <xsl:text>&gt;&#10;      &lt;!-- Populate request parameters according to the schema-defined model --&gt;&#10;    &lt;/m:</xsl:text>
-                    <xsl:value-of select="$operation-name"/>
-                    <xsl:text>&gt;&#10;  &lt;/soapenv:Body&gt;&#10;&lt;/soapenv:Envelope&gt;</xsl:text>
-                </code>
-            </pre>
-            		
-            <button type="button">
-                <xsl:attribute name="onclick">
-                    <xsl:text>copyExample('</xsl:text>
-                    <xsl:value-of select="$example-id"/>
-                    <xsl:text>')</xsl:text>
-                </xsl:attribute>
-                Copy
-            </button>
+            <div class="code-wrapper">
+                <pre>
+                    <button type="button" class="code-copy-btn">
+                        <xsl:attribute name="onclick">
+                            <xsl:text>copyExample('</xsl:text>
+                            <xsl:value-of select="$example-id"/>
+                            <xsl:text>')</xsl:text>
+                        </xsl:attribute>
+                        📋
+                    </button>
+                    <code id="{$example-id}">
+                        <xsl:text>&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:m="</xsl:text>
+                        <xsl:value-of select="$consolidated-wsdl/@targetNamespace"/>
+                        <xsl:text>"&gt;&#10;  &lt;soapenv:Header/&gt;&#10;  &lt;soapenv:Body&gt;&#10;    &lt;m:</xsl:text>
+                        <xsl:value-of select="$operation-name"/>
+                        <xsl:text>&gt;&#10;      &lt;!-- Populate request parameters according to the schema-defined model --&gt;&#10;    &lt;/m:</xsl:text>
+                        <xsl:value-of select="$operation-name"/>
+                        <xsl:text>&gt;&#10;  &lt;/soapenv:Body&gt;&#10;&lt;/soapenv:Envelope&gt;</xsl:text>
+                    </code>
+                </pre>
+            </div>
             	
         </div>
         
@@ -3501,7 +3532,7 @@ function copyExample(id) {
     
     <xsl:template name="service.render">
         
-        <div class="page">
+        <div class="page title-page">
             	
             <a class="target" name="page.service">
                 		
