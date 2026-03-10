@@ -14,16 +14,22 @@
 
             <form id="wsdl-form" method="post" enctype="multipart/form-data" action="/renderWsdl">
                 <div class="mb-3">
-                    <label for="wsdl_uri" class="form-label">WSDL URL</label>
-                    <input id="wsdl_uri" name="uri" class="form-control" placeholder="https://example.com/service.wsdl" />
+                    <label for="wsdl_uri" class="form-label" data-bs-toggle="tooltip" title="Clear the WSDL file selection to edit the URL.">WSDL URL</label>
+                    <div class="input-with-clear">
+                        <input id="wsdl_uri" name="uri" class="form-control" placeholder="https://example.com/service.wsdl" />
+                        <button type="button" class="clear-input-btn" aria-label="Clear WSDL URL" data-target-input="wsdl_uri">&times;</button>
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="wsdl_file" class="form-label">Or choose a local WSDL file</label>
-                    <input id="wsdl_file" name="wsdlFile" type="file" accept=".wsdl,.xml,.xsd" class="form-control" />
+                    <label for="wsdl_file" class="form-label" data-bs-toggle="tooltip" title="Clear the WSDL URL to enable file upload.">Or choose a local WSDL file</label>
+                    <div class="input-with-clear">
+                        <input id="wsdl_file" name="wsdlFile" type="file" accept=".wsdl,.xml,.xsd" class="form-control" />
+                        <button type="button" class="clear-input-btn" aria-label="Clear WSDL file" data-target-input="wsdl_file">&times;</button>
+                    </div>
                 </div>
 
-                <div id="wsdl-dropzone" class="dropzone" data-target-input="wsdl_file">
+                <div id="wsdl-dropzone" class="dropzone" data-target-input="wsdl_file" data-bs-toggle="tooltip" title="Clear the WSDL URL to enable file upload.">
                     <span class="dropzone-title">Drag &amp; drop WSDL file here</span>
                     <span class="dropzone-subtitle">We never upload anything beyond this browser session.</span>
                 </div>
@@ -39,13 +45,19 @@
 
             <form id="xsd-form" method="post" enctype="multipart/form-data" action="/renderXsd">
                 <div class="mb-3">
-                    <label for="xsd_uri" class="form-label">XSD URL</label>
-                    <input id="xsd_uri" name="uri" class="form-control" placeholder="https://example.com/schema.xsd" />
+                    <label for="xsd_uri" class="form-label" data-bs-toggle="tooltip" title="Clear the XSD file selection to edit the URL.">XSD URL</label>
+                    <div class="input-with-clear">
+                        <input id="xsd_uri" name="uri" class="form-control" placeholder="https://example.com/schema.xsd" />
+                        <button type="button" class="clear-input-btn" aria-label="Clear XSD URL" data-target-input="xsd_uri">&times;</button>
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label for="xsd_file" class="form-label">Or choose a local XSD file</label>
-                    <input id="xsd_file" name="xsdFile" type="file" accept=".xsd,.xml,.wsdl" class="form-control" />
+                    <div class="input-with-clear">
+                        <input id="xsd_file" name="xsdFile" type="file" accept=".xsd,.xml,.wsdl" class="form-control" />
+                        <button type="button" class="clear-input-btn" aria-label="Clear XSD file" data-target-input="xsd_file">&times;</button>
+                    </div>
                 </div>
 
                 <div id="xsd-dropzone" class="dropzone" data-target-input="xsd_file">
