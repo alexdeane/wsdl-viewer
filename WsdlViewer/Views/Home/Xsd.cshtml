@@ -1,0 +1,19 @@
+@model string
+@{
+    ViewData["Title"] = "XSD Render";
+}
+
+<div class="viewer-shell">
+    <div class="viewer-header">
+        <h1>Rendered XSD</h1>
+        <p>Explore the schema types, elements, and relationships for the selected XSD.</p>
+    </div>
+
+    <div class="wsdl-frame-container">
+        <iframe class="wsdl-frame">
+            @Html.Raw(Model)
+        </iframe>
+    </div>
+</div>
+
+

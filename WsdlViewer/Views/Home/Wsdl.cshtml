@@ -1,0 +1,16 @@
+@model string
+@{
+    ViewData["Title"] = "WSDL Render";
+}
+
+<div class="viewer-shell">
+    <div class="viewer-header">
+        <h1>Rendered WSDL</h1>
+        <p>Explore the operations, models, and source for the selected WSDL.</p>
+    </div>
+
+    <div class="wsdl-frame-container">
+        @Html.Raw(Model)
+    </div>
+</div>
+

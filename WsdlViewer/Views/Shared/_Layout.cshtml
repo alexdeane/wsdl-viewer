@@ -9,16 +9,7 @@
 </head>
 <body class="app-body">
     <div class="app-root">
-        <header class="app-header">
-            <div class="app-header-inner container">
-                <div class="app-brand">
-                    <a asp-area="" asp-controller="Home" asp-action="Index">WSDL Viewer</a>
-                </div>
-                <div class="app-header-meta">
-                    <span class="app-tag">Schema explorer</span>
-                </div>
-            </div>
-        </header>
+        @await Html.PartialAsync("_AppHeader")
 
         <main class="app-main container">
             @RenderBody()
